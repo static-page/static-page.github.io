@@ -1,0 +1,48 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Let a running deploy finish, but keep only the newest queued one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      # Las credenciales son públicas por diseño (viajan en el navegador); se
+      # inyectan aquí para no fijarlas en el repositorio. Se aceptan tanto como
+      # variables como secretos, según dónde se hayan dado de alta.
+      - name: Credenciales de Google
+        env:
+          GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID || secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_API_KEY: ${{ vars.GOOGLE_API_KEY || secrets.GOOGLE_API_KEY }}
+          VIEWER_URL: ${{ vars.VIEWER_URL }}
+        run: node tools/write-config.js
+
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

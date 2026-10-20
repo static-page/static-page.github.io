@@ -1,0 +1,13 @@
+{
+  "name": "static-page",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Publica páginas HTML desde tu propio Google Drive. El sitio es estático; esto solo existe para poder ejecutar los tests.",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1"
+  }
+}

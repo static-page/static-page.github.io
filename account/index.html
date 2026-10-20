@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#c2410c">
+<title>Mi carpeta · StaticPage</title>
+<meta name="description" content="Tus páginas HTML guardadas en tu propio Google Drive: publícalas con un enlace corto, reemplázalas sin cambiar el enlace y bórralas.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23c2410c'/%3E%3Cpath d='m12 11-5 5 5 5M20 11l5 5-5 5M17.5 9.5l-3 13' fill='none' stroke='white' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="../assets/style.css">
+<!-- Sin defer: aplica el tema antes del primer pintado, si no hay destello. -->
+<script src="../assets/theme.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero hero-compact">
+    <a class="back" href="../">← StaticPage</a>
+    <h1 id="folderTitle">Mi carpeta</h1>
+    <p class="tagline" id="folderSub">Tus páginas HTML, guardadas en tu propio Google Drive.</p>
+    <nav class="crumbs" id="crumbs" aria-label="Ruta de carpetas" hidden></nav>
+  </header>
+
+  <main>
+    <!-- Sin credenciales en el despliegue no hay nada que enseñar -->
+    <section class="card" id="offBox" hidden>
+      <p class="hint hint-flush">Este StaticPage no tiene configurado Google Drive, así que
+      no hay carpeta que mostrar.</p>
+      <a class="btn btn-primary" href="../">Volver a la portada</a>
+    </section>
+
+    <!-- Paso 0: identificarse -->
+    <section class="card signin" id="signinBox" hidden>
+      <button type="button" class="btn btn-google" id="btnSignin">
+        <svg viewBox="0 0 18 18" width="18" height="18" aria-hidden="true"><path fill="#4285f4" d="M17.6 9.2c0-.6-.1-1.2-.2-1.8H9v3.5h4.8a4.1 4.1 0 0 1-1.8 2.7v2.2h2.9c1.7-1.6 2.7-3.9 2.7-6.6Z"/><path fill="#34a853" d="M9 18c2.4 0 4.5-.8 6-2.2l-2.9-2.2c-.8.5-1.8.9-3.1.9-2.4 0-4.4-1.6-5.1-3.8H.9v2.3A9 9 0 0 0 9 18Z"/><path fill="#fbbc04" d="M3.9 10.7a5.4 5.4 0 0 1 0-3.4V5H.9a9 9 0 0 0 0 8l3-2.3Z"/><path fill="#ea4335" d="M9 3.6c1.3 0 2.5.5 3.4 1.3l2.6-2.6A9 9 0 0 0 .9 5l3 2.3C4.6 5.2 6.6 3.6 9 3.6Z"/></svg>
+        Entrar con Google
+      </button>
+      <p class="signin-copy">
+        Conecta tu Google Drive para publicar aquí tus páginas. Se quedan en
+        <strong>tu</strong> cuenta: StaticPage no almacena nada y solo puede ver
+        los archivos que cree desde aquí.
+      </p>
+      <p class="hint" id="signinError" hidden></p>
+    </section>
+
+    <!-- Paso 1: la carpeta -->
+    <section id="folderBox" hidden>
+      <div class="card quota" id="quotaBox" hidden>
+        <div class="quota-head">
+          <span class="quota-title">Espacio de tu Drive</span>
+          <span class="quota-figure" id="quotaFigure"></span>
+        </div>
+        <div class="meter-bar"><i id="quotaFill"></i></div>
+        <p class="hint" id="quotaNote"></p>
+      </div>
+
+      <section class="card folder-head" id="uploadCard">
+        <span class="folder-name" id="folderName">StaticPage</span>
+        <div class="head-actions">
+          <button type="button" class="icon-btn" id="btnPaste" title="Nueva página pegando el código" aria-label="Nueva página pegando el código">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5"/><path d="m10 12-2 2 2 2M14 12l2 2-2 2"/></svg>
+          </button>
+          <button type="button" class="icon-btn" id="btnNewFolder" title="Nueva carpeta" aria-label="Nueva carpeta">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><path d="M12 11v5M9.5 13.5h5"/></svg>
+          </button>
+          <button type="button" class="icon-btn" id="btnRefresh" title="Actualizar" aria-label="Actualizar">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
+          </button>
+          <button type="button" class="icon-btn" id="btnShareFolder" title="Compartir la carpeta" aria-label="Compartir la carpeta">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+          </button>
+        </div>
+      </section>
+
+      <!-- Todo el contenido es zona de soltar: la carpeta entera acepta HTML. -->
+      <section class="folder-content" id="folderContent">
+        <input type="file" id="file" accept=".html,.htm,text/html" multiple hidden>
+        <p class="empty" id="emptyNote" hidden>Todavía no hay nada aquí.</p>
+
+        <ul class="folders" id="folders"></ul>
+        <ul class="folders pages" id="pages"></ul>
+
+        <label class="add-zone" id="addZone" for="file">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+          <span class="add-title">Añadir páginas HTML</span>
+          <span class="add-sub">toca para elegir, o arrastra los archivos aquí</span>
+        </label>
+      </section>
+
+      <section class="danger-zone" id="dangerZone">
+        <button type="button" class="danger-toggle" id="btnDangerToggle" aria-expanded="false" aria-controls="dangerBody">
+          <span>Zona de riesgo</span>
+          <span class="danger-caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="danger-body" id="dangerBody" hidden>
+          <p class="hint" id="dangerNote"></p>
+          <button type="button" class="btn btn-danger" id="btnDeleteFolder">Borrar esta carpeta</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <span id="footNote">Las páginas viven en tu cuenta de Google, no en StaticPage.</span>
+  </footer>
+</div>
+
+<dialog id="shareDialog" class="dialog">
+  <div class="dialog-head">
+    <h2 id="shareTitle">Compartir</h2>
+    <button type="button" class="icon-btn" data-close-dialog aria-label="Cerrar">✕</button>
+  </div>
+  <p class="hint" id="shareNote"></p>
+  <textarea id="shareLink" class="link" rows="2" readonly spellcheck="false"></textarea>
+  <div class="dialog-foot">
+    <button type="button" class="linkish" id="btnUnshare">Dejar de compartir</button>
+    <div class="dialog-actions">
+      <a class="btn btn-ghost btn-icon" id="btnShareOpen" target="_blank" rel="noopener" title="Abrir el enlace" aria-label="Abrir el enlace">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+      </a>
+      <button type="button" class="btn btn-primary" id="btnCopyShare">Copiar enlace</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- La vista previa va en un <iframe> con sandbox y sin allow-same-origin: al
+     lado está la sesión de Drive, y la página no debe alcanzarla. -->
+<dialog id="previewDialog" class="dialog dialog-preview">
+  <div class="dialog-head">
+    <h2 id="previewTitle">Página</h2>
+    <button type="button" class="icon-btn" data-close-dialog aria-label="Cerrar">✕</button>
+  </div>
+  <div class="preview-stage" id="previewStage">
+    <p class="hint" id="previewStatus">Cargando…</p>
+  </div>
+  <div class="dialog-foot">
+    <span class="hint" id="previewMeta"></span>
+    <div class="dialog-actions">
+      <input type="file" id="replaceFile" accept=".html,.htm,text/html" hidden>
+      <button type="button" class="btn btn-ghost btn-icon" id="btnPreviewReplace" title="Reemplazar por otro archivo (el enlace no cambia)" aria-label="Reemplazar por otro archivo">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="m7 9 5-5 5 5"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
+      <button type="button" class="btn btn-ghost btn-icon is-danger" id="btnPreviewDelete" title="Borrar" aria-label="Borrar">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12"/><path d="M9 7V4h6v3"/></svg>
+      </button>
+      <button type="button" class="btn btn-ghost btn-icon" id="btnPreviewShare" title="Compartir" aria-label="Compartir">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/></svg>
+      </button>
+      <a class="btn btn-ghost btn-icon" id="btnPreviewOpen" target="_blank" rel="noopener" title="Abrir la página publicada" aria-label="Abrir la página publicada">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+      </a>
+    </div>
+  </div>
+</dialog>
+
+<!-- Una página nueva sin archivo: el código pegado tal cual. -->
+<dialog id="pasteDialog" class="dialog">
+  <form method="dialog" id="pasteForm">
+    <div class="dialog-head">
+      <h2>Nueva página</h2>
+      <button type="button" class="icon-btn" data-close-dialog aria-label="Cerrar">✕</button>
+    </div>
+    <div class="dialog-body">
+      <label class="field">
+        <span class="field-label">Nombre</span>
+        <input type="text" id="pasteName" class="input" placeholder="mi-pagina.html" autocomplete="off" spellcheck="false">
+      </label>
+      <label class="field">
+        <span class="field-label">Código HTML</span>
+        <textarea id="pasteCode" class="input code-input" rows="10" spellcheck="false" placeholder="<!DOCTYPE html>&#10;<html>&#10;  …"></textarea>
+      </label>
+      <p class="hint is-error" id="pasteError" hidden></p>
+    </div>
+    <div class="dialog-foot">
+      <button type="button" class="btn btn-ghost" data-close-dialog>Cancelar</button>
+      <button type="submit" class="btn btn-primary" id="btnPasteOk" value="ok">Crear página</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Confirmar y pedir un nombre, en la propia página: confirm() y prompt() son
+     del navegador, no se pueden vestir y en móvil aparecen donde quieren. -->
+<dialog id="askDialog" class="dialog dialog-ask">
+  <form method="dialog" id="askForm">
+    <div class="dialog-head">
+      <h2 id="askTitle">Confirmar</h2>
+      <button type="button" class="icon-btn" data-close-dialog aria-label="Cerrar">✕</button>
+    </div>
+    <div class="dialog-body">
+      <p class="hint" id="askNote"></p>
+      <label class="field" id="askField" hidden>
+        <span class="field-label" id="askLabel">Nombre</span>
+        <input type="text" id="askInput" class="input" autocomplete="off" spellcheck="false">
+      </label>
+      <p class="hint is-error" id="askError" hidden></p>
+    </div>
+    <div class="dialog-foot">
+      <button type="button" class="btn btn-ghost" data-close-dialog>Cancelar</button>
+      <button type="submit" class="btn btn-primary" id="btnAskOk" value="ok">Aceptar</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="../assets/config.js" defer></script>
+<script src="../assets/page.js" defer></script>
+<script src="../assets/drive.js" defer></script>
+<script src="../assets/account.js" defer></script>
+</body>
+</html>
